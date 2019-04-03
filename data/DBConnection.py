@@ -4,7 +4,6 @@ from data import Member
 
 
 class DBConnection:
-
     __PATH_TO_DB = "database/data.db"
     if not os.path.exists(__PATH_TO_DB):
         os.mkdir("database")
@@ -37,9 +36,10 @@ class DBConnection:
         DBConnection.__con.commit()
 
     @staticmethod
-    def remove_member(member):
+    def remove_member(member_id):
+        id_tuple = (member_id,)
         query = "DELETE FROM member_info WHERE member_info.id = ?;"
-        DBConnection.cursor.execute(query, member.ID)
+        DBConnection.cursor.execute(query, id_tuple)
         DBConnection.__con.commit()
 
     @staticmethod
@@ -77,11 +77,11 @@ class DBConnection:
         member.ID = member_info[0]
         member.first_name = member_info[1]
         member.last_name = member_info[2]
-        member.first_name_is_duplicate = member_info[3]
-        member.can_be_stage = member_info[4]
-        member.can_rotate_mic = member_info[5]
-        member.can_assist_2nd_hall = member_info[6]
-        member.has_sunday_exception = member_info[7]
+        member.first_name_is_duplicate = bool(member_info[3])
+        member.can_be_stage = bool(member_info[4])
+        member.can_rotate_mic = bool(member_info[5])
+        member.can_assist_2nd_hall = bool(member_info[6])
+        member.has_sunday_exception = bool(member_info[7])
 
         return member
 
@@ -95,11 +95,11 @@ class DBConnection:
             member.ID = member_info[0]
             member.first_name = member_info[1]
             member.last_name = member_info[2]
-            member.first_name_is_duplicate = member_info[3]
-            member.can_be_stage = member_info[4]
-            member.can_rotate_mic = member_info[5]
-            member.can_assist_2nd_hall = member_info[6]
-            member.has_sunday_exception = member_info[7]
+            member.first_name_is_duplicate = bool(member_info[3])
+            member.can_be_stage = bool(member_info[4])
+            member.can_rotate_mic = bool(member_info[5])
+            member.can_assist_2nd_hall = bool(member_info[6])
+            member.has_sunday_exception = bool(member_info[7])
             all_members.append(member)
 
         return all_members
