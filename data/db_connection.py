@@ -73,17 +73,17 @@ class DBConnection:
         query = "SELECT * FROM member_info WHERE member_info.id = ?;"
 
         member_info = DBConnection.cursor.execute(query, id_tuple).fetchone()
-        member = member.Member()
-        member.ID = member_info[0]
-        member.first_name = member_info[1]
-        member.last_name = member_info[2]
-        member.first_name_is_duplicate = bool(member_info[3])
-        member.can_be_stage = bool(member_info[4])
-        member.can_rotate_mic = bool(member_info[5])
-        member.can_assist_2nd_hall = bool(member_info[6])
-        member.has_sunday_exception = bool(member_info[7])
+        _member = member.Member()
+        _member.ID = member_info[0]
+        _member.first_name = member_info[1]
+        _member.last_name = member_info[2]
+        _member.first_name_is_duplicate = bool(member_info[3])
+        _member.can_be_stage = bool(member_info[4])
+        _member.can_rotate_mic = bool(member_info[5])
+        _member.can_assist_2nd_hall = bool(member_info[6])
+        _member.has_sunday_exception = bool(member_info[7])
 
-        return member
+        return _member
 
     @staticmethod
     def get_all_members():
@@ -91,15 +91,15 @@ class DBConnection:
         all_members = []
 
         for member_info in DBConnection.cursor.execute(query).fetchall():
-            member = member.Member()
-            member.ID = member_info[0]
-            member.first_name = member_info[1]
-            member.last_name = member_info[2]
-            member.first_name_is_duplicate = bool(member_info[3])
-            member.can_be_stage = bool(member_info[4])
-            member.can_rotate_mic = bool(member_info[5])
-            member.can_assist_2nd_hall = bool(member_info[6])
-            member.has_sunday_exception = bool(member_info[7])
-            all_members.append(member)
+            _member = member.Member()
+            _member.ID = member_info[0]
+            _member.first_name = member_info[1]
+            _member.last_name = member_info[2]
+            _member.first_name_is_duplicate = bool(member_info[3])
+            _member.can_be_stage = bool(member_info[4])
+            _member.can_rotate_mic = bool(member_info[5])
+            _member.can_assist_2nd_hall = bool(member_info[6])
+            _member.has_sunday_exception = bool(member_info[7])
+            all_members.append(_member)
 
         return all_members
