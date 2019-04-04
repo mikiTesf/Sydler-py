@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from data import Member
+from data import member
 
 
 class DBConnection:
@@ -73,7 +73,7 @@ class DBConnection:
         query = "SELECT * FROM member_info WHERE member_info.id = ?;"
 
         member_info = DBConnection.cursor.execute(query, id_tuple).fetchone()
-        member = Member.Member()
+        member = member.Member()
         member.ID = member_info[0]
         member.first_name = member_info[1]
         member.last_name = member_info[2]
@@ -91,7 +91,7 @@ class DBConnection:
         all_members = []
 
         for member_info in DBConnection.cursor.execute(query).fetchall():
-            member = Member.Member()
+            member = member.Member()
             member.ID = member_info[0]
             member.first_name = member_info[1]
             member.last_name = member_info[2]
