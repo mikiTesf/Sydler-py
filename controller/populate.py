@@ -33,7 +33,7 @@ class Populate:
                 var_occupied = self.is_occupied(member.ID, _role)
 
                 if _role == role.Role.STAGE:
-                    var_role_exception = self.has_exception(member.excep)
+                    var_role_exception = self.has_exception(member.has_sunday_exception)
 
                 var_distance = self.distance(member.ID)
                 var_appearance_before = self.number_of_times_before(member.ID)
@@ -80,7 +80,7 @@ class Populate:
         distance = maximum_distance
         member_id_found = False
 
-        for index in range(len(self.__assignment_queue), -1, -1):
+        for index in range(len(self.__assignment_queue) - 1, -1, -1):
             if self.__assignment_queue[index].assignee_id == member_id:
                 member_id_found = True
                 distance += 1
