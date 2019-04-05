@@ -24,7 +24,7 @@ class Populate:
                 if _role is Role.STAGE:
                     var_qualify = self.qualify(_member.can_be_stage)
                 elif _role in [
-                    Role.IC_ROUND_1_LEFT,
+                    Role.MIC_ROUND_1_LEFT,
                     Role.MIC_ROUND_2_RIGHT,
                     Role.MIC_ROUND_2_LEFT,
                     Role.MIC_ROUND_2_RIGHT
@@ -131,14 +131,20 @@ class Populate:
         random_index = random.randint(0, len(chosen_member_ids) - 1)
         return chosen_member_ids[random_index]
 
+    def get_assignments(self):
+        for _role in Role.get_roles():
+            self.populate_role(_role)
+        return self.__assignment_queue
+
     # def show_assignments(self):
     #     for _assignment in self.__assignment_queue:
     #         for _date in self.__program_dates:
     #             if _assignment.assignment_date == _date:
     #                 print(_assignment.assignment_date, _assignment.target_role, _assignment.assignee_id, sep=" : ")
 
-# uncomment `show_assignments()` in the class above and the code below this comment
-# in order to test/debug this class
+
+# # uncomment `show_assignments()` in the class above and the code below this comment
+# # in order to test/debug this class
 # day = datetime.datetime.now()
 # dates = [
 #     day + datetime.timedelta(days=1),
@@ -156,8 +162,6 @@ class Populate:
 # ]
 #
 # popular = Populate(dates)
-#
-# for __role__ in Role.get_roles():
-#     popular.populate_role(__role__)
+# assignments = popular.get_assignments()
 #
 # popular.show_assignments()
