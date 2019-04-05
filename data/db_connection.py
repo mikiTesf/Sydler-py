@@ -4,23 +4,23 @@ from data import member
 
 
 class DBConnection:
-    __PATH_TO_DB = "database/data.db"
+    __PATH_TO_DB = "../database/data.db"
     if not os.path.exists(__PATH_TO_DB):
-        os.mkdir("database")
+        os.mkdir("../database")
 
     __con = sqlite3.connect(__PATH_TO_DB)
     cursor = __con.cursor()
 
     @staticmethod
-    def add_member(member):
+    def add_member(_member):
         member_data = (
-            member.first_name,
-            member.last_name,
-            member.has_sunday_exception,
-            member.can_be_stage,
-            member.can_rotate_mic,
-            member.can_assist_2nd_hall,
-            member.has_sunday_exception
+            _member.first_name,
+            _member.last_name,
+            _member.has_sunday_exception,
+            _member.can_be_stage,
+            _member.can_rotate_mic,
+            _member.can_assist_2nd_hall,
+            _member.has_sunday_exception
         )
 
         query = "INSERT INTO member_info " \
@@ -43,16 +43,16 @@ class DBConnection:
         DBConnection.__con.commit()
 
     @staticmethod
-    def update_member(member):
+    def update_member(_member):
         member_data = (
-            member.first_name,
-            member.last_name,
-            member.has_sunday_exception,
-            member.can_be_stage,
-            member.can_rotate_mic,
-            member.can_assist_2nd_hall,
-            member.has_sunday_exception,
-            member.ID
+            _member.first_name,
+            _member.last_name,
+            _member.has_sunday_exception,
+            _member.can_be_stage,
+            _member.can_rotate_mic,
+            _member.can_assist_2nd_hall,
+            _member.has_sunday_exception,
+            _member.ID
         )
 
         query = "UPDATE member_info SET " \

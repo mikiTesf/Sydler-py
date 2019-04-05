@@ -1,10 +1,8 @@
-
-
 class Assignment:
 
-    def __init__(self, member_id, date_time, role):
+    def __init__(self, member_id, date_time, _role):
         self.assignee_id = member_id
-        self.role = role
+        self.target_role = _role
         self.assignment_date = date_time
 
     # def __eq__(self, other):
