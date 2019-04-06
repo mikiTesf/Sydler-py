@@ -20,8 +20,10 @@ class Populate:
         id_rank_pair = dict()
 
         for _date in self.__program_dates:
+            if (_role == Role.SECOND_HALL) and self.is_sunday(_date):
+                continue
             for _member in self.__all_members:
-                if _role is Role.STAGE:
+                if _role == Role.STAGE:
                     var_qualify = self.qualify(_member.can_be_stage)
                 elif _role in [
                     Role.MIC_ROUND_1_LEFT,
@@ -73,7 +75,7 @@ class Populate:
 
     def has_exception(self, has_exception, _date):
         # in Python's datetime class the 6th weekday is Sunday
-        if (_date.weekday() == 6) and has_exception:
+        if self.is_sunday(_date) and has_exception:
             return self.__NORMAL
         return self.__BEST
 
@@ -130,6 +132,10 @@ class Populate:
         # the process even more random)
         random_index = random.randint(0, len(chosen_member_ids) - 1)
         return chosen_member_ids[random_index]
+
+    @staticmethod
+    def is_sunday(_date_):
+        return _date_.isoweekday() == 7
 
     def get_assignments(self):
         for _role in Role.get_roles():
