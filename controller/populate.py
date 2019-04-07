@@ -1,4 +1,5 @@
 import random
+import sys
 # import datetime
 
 from controller.role import Role
@@ -11,6 +12,9 @@ class Populate:
     def __init__(self, total_days):
         self.__program_dates = total_days
         self.__all_members = DBConnection.get_all_members()
+        if len(self.__all_members) == 0:
+            print('no members found in the database\nexiting...')
+            sys.exit()
         self.__assignment_queue = []
         self.__BEST = 2.0
         self.__NORMAL = 1.0
