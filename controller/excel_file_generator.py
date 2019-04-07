@@ -8,7 +8,7 @@ from openpyxl.styles import Border
 from openpyxl.styles import Side
 from openpyxl.styles import Color
 
-from controller.populate import Populate
+# from controller.populate import Populate
 from controller.role import Role
 from data.db_connection import DBConnection
 
@@ -63,18 +63,20 @@ class ExcelFileGenerator:
         list.sort(self.__round_2_right_assignees, key=lambda _assignment: _assignment.assignment_date)
         list.sort(self.__second_hall_assignees, key=lambda _assignment: _assignment.assignment_date)
 
-    def fill_header_info(self):
-        a1 = self.active_sheet['A1']
-        a1.value = 'የአዲስ ሰፈር ጉባኤ\nየድምጽ ክፍል ፕሮግራም'
+    def fill_page_title(self):
+        self.active_sheet['A1'].value = 'የአዲስ ሰፈር ጉባኤ\nየድምጽ ክፍል ፕሮግራም'
         self.active_sheet.merge_cells('A1:H1')
+        self.format_header_section()
+
+    def format_header_section(self):
         title_font = Font(size=25, bold=True)
         title_alignment = Alignment(horizontal="center", vertical="center")
-        a1.font = title_font
-        a1.alignment = title_alignment
+        self.active_sheet['A1'].font = title_font
+        self.active_sheet['A1'].alignment = title_alignment
 
     def make_excel(self):
         self.sort_assignees()
-        self.fill_header_info()
+        self.fill_page_title()
         self.fill_column_titles()
         self.fill_week_spans()
         self.fill_meeting_day_names()
@@ -82,11 +84,6 @@ class ExcelFileGenerator:
         self.complete_generation()
 
     def fill_column_titles(self):
-        title_font = Font(size=12, bold=True)
-        alignment = Alignment(horizontal='center', vertical='center')
-        fill_color = PatternFill(patternType='solid', fgColor=Color(rgb="BBBBBB"))
-        border = Border(left=Side('thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
-
         week_span_column_title = 'ሳምንት'
         week_span_title_cell = 'A2'
         self.active_sheet[week_span_title_cell] = week_span_column_title
@@ -112,6 +109,13 @@ class ExcelFileGenerator:
         second_hall_title_title = 'ሁለተኛ አዳራሽ'
         second_hall_title_cell = 'H2'
         self.active_sheet[second_hall_title_cell] = second_hall_title_title
+        self.format_column_titles()
+
+    def format_column_titles(self):
+        title_font = Font(size=12, bold=True)
+        alignment = Alignment(horizontal='center', vertical='center')
+        fill_color = PatternFill(patternType='solid', fgColor=Color(rgb="BBBBBB"))
+        border = Border(left=Side('thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
 
         for column in range(1, 9):
             self.active_sheet.cell(2, column).font = title_font
@@ -120,19 +124,16 @@ class ExcelFileGenerator:
             self.active_sheet.cell(2, column).border = border
 
     def fill_week_spans(self):
-        _border = Border(right=Side('thin'), left=Side('thin'), bottom=Side('thin'))
-        _alignment = Alignment(vertical='center', horizontal='center')
-        _fill = PatternFill(patternType='solid', fgColor=Color(rgb="BBBBBB"))
-
         row = 3
-        for _index in range(0, len(self.__program_dates) - 1, 2):
+        for arr_index in range(0, len(self.__program_dates), 2):
             # * Every even index contains a mid-week meeting date
             # * Every odd index contains a weekend meeting date
             # * Therefore to find the beginning of the week (the date on the week's Monday)
             # the day of any mid-week meeting date must be reduced by the number of days
             # it extends from the last Monday
-            week_beginning_date = self.__program_dates[_index] + datetime.timedelta(days=-self.__program_dates[_index].weekday())
-            week_ending_date = self.__program_dates[_index + 1]
+            week_beginning_date = self.__program_dates[arr_index] + datetime.timedelta(
+                days=-self.__program_dates[arr_index].weekday())
+            week_ending_date = self.__program_dates[arr_index + 1]
             month_on_monday = week_beginning_date.strftime('%b')
             day_on_monday = week_beginning_date.day
             if week_ending_date.month != week_beginning_date.month:
@@ -144,47 +145,68 @@ class ExcelFileGenerator:
                                               day_on_monday,
                                               month_on_weekend,
                                               day_on_weekend)
-            cell = 'A' + str(row)
-            self.active_sheet[cell].value = week_span
-            self.active_sheet[cell].border = _border
-            self.active_sheet[cell].alignment = _alignment
-            self.active_sheet[cell].fill = _fill
-            self.active_sheet.merge_cells(cell + ":A" + str(row + 1))
+            begin_cell = 'A' + str(row)
+            end_cell = 'A' + str(row + 1)
+            self.active_sheet[begin_cell].value = week_span
+            self.active_sheet.merge_cells(begin_cell + ":" + end_cell)
             row += 2
+        self.format_week_span_cells()
+
+    def format_week_span_cells(self):
+        _border = Border(right=Side('thin'), left=Side('thin'), top=Side('thin'), bottom=Side('thin'))
+        _alignment = Alignment(vertical='center', horizontal='center')
+        _fill = PatternFill(patternType='solid', fgColor=Color(rgb="BBBBBB"))
+        # because `range(...)` doesn't include the upper bound when generating values,
+        # the upper bound of the next loop, which increments by 2 on every iteration,
+        # must be increased by 2. This increment is important because `row_index` is
+        # initially 3 which creates an offset of +2 when compared to the index of the row
+        # at which the last stage assignee is found.
+        for row_index in range(3, len(self.__stage_assignees) + 2, 2):
+            cell = 'A' + str(row_index)
+            self.active_sheet[cell].fill = _fill
+            self.active_sheet[cell].alignment = _alignment
+            self.active_sheet[cell].border = _border
 
     def fill_meeting_day_names(self):
         column = 'B'
         row = 3
-        _alignment = Alignment(horizontal='center', vertical='center')
-        _border = Border(bottom=Side('thin'), right=Side('thin'))
 
         for _date in self.__program_dates:
             self.active_sheet[column + str(row)].value = _date.strftime('%A')
+            row += 1
+        self.format_meeting_day_cells()
+
+    def format_meeting_day_cells(self):
+        _alignment = Alignment(horizontal='center', vertical='center')
+        _border = Border(bottom=Side('thin'), right=Side('thin'))
+
+        column = 'B'
+        row = 3
+
+        for _index in range(len(self.__program_dates)):
             self.active_sheet[column + str(row)].alignment = _alignment
             self.active_sheet[column + str(row)].border = _border
             row += 1
 
     def fill_assignees(self):
         row_increment = 1
-        _alignment = Alignment(horizontal='center', vertical='center')
-        _border = Border(bottom=Side('thin'), right=Side('thin'))
 
-        for _role in Role.get_roles():
+        for role_ in Role.get_roles():
             row = 3
 
-            if _role == Role.STAGE:
+            if role_ == Role.STAGE:
                 assignee_queue = self.__stage_assignees
                 column = 'C'
-            elif _role == Role.MIC_ROUND_1_LEFT:
+            elif role_ == Role.MIC_ROUND_1_LEFT:
                 assignee_queue = self.__round_1_left_assignees
                 column = 'D'
-            elif _role == Role.MIC_ROUND_1_RIGHT:
+            elif role_ == Role.MIC_ROUND_1_RIGHT:
                 assignee_queue = self.__round_1_right_assignees
                 column = 'E'
-            elif _role == Role.MIC_ROUND_2_LEFT:
+            elif role_ == Role.MIC_ROUND_2_LEFT:
                 assignee_queue = self.__round_2_left_assignees
                 column = 'F'
-            elif _role == Role.MIC_ROUND_2_RIGHT:
+            elif role_ == Role.MIC_ROUND_2_RIGHT:
                 assignee_queue = self.__round_2_right_assignees
                 column = 'G'
             else:
@@ -192,28 +214,52 @@ class ExcelFileGenerator:
                 column = 'H'
                 row_increment = 2
 
-            for _assignment in assignee_queue:
+            for assignment in assignee_queue:
                 assignment_cell = column + str(row)
-                self.active_sheet[assignment_cell].value = self.name_id_pair[_assignment.assignee_id]
+                self.active_sheet[assignment_cell].value = self.name_id_pair[assignment.assignee_id]
+                row += row_increment
+        self.format_assignee_cells()
+
+    def format_assignee_cells(self):
+        _alignment = Alignment(horizontal='center', vertical='center')
+        _border = Border(bottom=Side('thin'), right=Side('thin'))
+
+        for role_ in Role.get_roles():
+
+            if role_ == Role.STAGE:
+                column = 'C'
+            elif role_ == Role.MIC_ROUND_1_LEFT:
+                column = 'D'
+            elif role_ == Role.MIC_ROUND_1_RIGHT:
+                column = 'E'
+            elif role_ == Role.MIC_ROUND_2_LEFT:
+                column = 'F'
+            elif role_ == Role.MIC_ROUND_2_RIGHT:
+                column = 'G'
+            else:
+                column = 'H'
+
+            for row_index in range(1, len(self.__stage_assignees) + 1):
+                assignment_cell = column + str(row_index + 2)
                 self.active_sheet[assignment_cell].alignment = _alignment
                 self.active_sheet[assignment_cell].border = _border
-                row += row_increment
 
     def complete_generation(self):
         self.active_sheet.paper_size = 'A4'
         self.__workbook.save("../schedule.xlsx")
 
 
+# use the code below to test/debug this class
 # `day` below is a Tuesday
-day = datetime.date(2019, 4, 9)
-dates = [day]
-
-days_to_add = 5
-for index in range(1, 32):
-    day = day + datetime.timedelta(days=days_to_add)
-    dates.append(day)
-    days_to_add = 2 if days_to_add == 5 else 5
-
-populate = Populate(dates)
-file_generator = ExcelFileGenerator(populate.get_assignments())
-file_generator.make_excel()
+# day = datetime.date(2019, 4, 9)
+# dates = [day]
+#
+# days_to_add = 5
+# for index in range(1, 32):
+#     day = day + datetime.timedelta(days=days_to_add)
+#     dates.append(day)
+#     days_to_add = 2 if days_to_add == 5 else 5
+#
+# populate = Populate(dates)
+# file_generator = ExcelFileGenerator(populate.get_assignments())
+# file_generator.make_excel()
