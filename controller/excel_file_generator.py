@@ -10,7 +10,7 @@ from openpyxl.styles import Color
 
 from controller.populate import Populate
 from controller.role import Role
-from data.db_connection import DBConnection
+from data.member import Member
 
 
 class ExcelFileGenerator:
@@ -36,7 +36,7 @@ class ExcelFileGenerator:
         # Therefore, there should be a dictionary from which the corresponding member name
         # can be fetched
         self.name_id_pair = dict()
-        for _member in DBConnection.get_all_members():
+        for _member in Member.get_all_members():
             if _member.first_name_is_duplicate:
                 self.name_id_pair[_member.ID] = _member.first_name + ' ' + _member.last_name
             self.name_id_pair[_member.ID] = _member.first_name

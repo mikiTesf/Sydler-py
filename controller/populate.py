@@ -4,14 +4,14 @@ import sys
 
 from controller.role import Role
 from controller.assignment import Assignment
-from data.db_connection import DBConnection
+from data.member import Member
 
 
 class Populate:
 
     def __init__(self, total_days):
         self.__program_dates = total_days
-        self.__all_members = DBConnection.get_all_members()
+        self.__all_members = Member.get_all_members()
         if len(self.__all_members) == 0:
             print('no members found in the database\nexiting...')
             sys.exit()
