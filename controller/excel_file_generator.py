@@ -162,7 +162,7 @@ class ExcelFileGenerator:
         # initially 3 which creates an offset of +2 when compared to the index of the row
         # at which the last stage assignee is found.
         last_row_index = 0
-        # due to reason above the row that should be styled to in order to fully border
+        # due to  the reason above, the row that should be styled in order to fully border
         # the last week-span cell must change from the 'top-left cell' to 'the 'bottom-left cell'
         # (read the documentation for openpyxl for the details of cell styling). That's why
         # the `last_row_index` variable above is important
