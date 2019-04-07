@@ -8,7 +8,7 @@ from openpyxl.styles import Border
 from openpyxl.styles import Side
 from openpyxl.styles import Color
 
-# from controller.populate import Populate
+from controller.populate import Populate
 from controller.role import Role
 from data.db_connection import DBConnection
 
@@ -153,7 +153,7 @@ class ExcelFileGenerator:
         self.format_week_span_cells()
 
     def format_week_span_cells(self):
-        _border = Border(right=Side('thin'), left=Side('thin'), top=Side('thin'), bottom=Side('thin'))
+        _border = Border(right=Side('thin'), left=Side('thin'), top=Side('thin'))
         _alignment = Alignment(vertical='center', horizontal='center')
         _fill = PatternFill(patternType='solid', fgColor=Color(rgb="BBBBBB"))
         # because `range(...)` doesn't include the upper bound when generating values,
@@ -161,11 +161,19 @@ class ExcelFileGenerator:
         # must be increased by 2. This increment is important because `row_index` is
         # initially 3 which creates an offset of +2 when compared to the index of the row
         # at which the last stage assignee is found.
+        last_row_index = 0
+        # due to reason above the row that should be styled to in order to fully border
+        # the last week-span cell must change from the 'top-left cell' to 'the 'bottom-left cell'
+        # (read the documentation for openpyxl for the details of cell styling). That's why
+        # the `last_row_index` variable above is important
         for row_index in range(3, len(self.__stage_assignees) + 2, 2):
             cell = 'A' + str(row_index)
             self.active_sheet[cell].fill = _fill
             self.active_sheet[cell].alignment = _alignment
             self.active_sheet[cell].border = _border
+            last_row_index = row_index + 1
+        _border = Border(bottom=Side('thin'))
+        self.active_sheet['A' + str(last_row_index)].border = _border
 
     def fill_meeting_day_names(self):
         column = 'B'
@@ -251,15 +259,15 @@ class ExcelFileGenerator:
 
 # use the code below to test/debug this class
 # `day` below is a Tuesday
-# day = datetime.date(2019, 4, 9)
-# dates = [day]
-#
-# days_to_add = 5
-# for index in range(1, 32):
-#     day = day + datetime.timedelta(days=days_to_add)
-#     dates.append(day)
-#     days_to_add = 2 if days_to_add == 5 else 5
-#
-# populate = Populate(dates)
-# file_generator = ExcelFileGenerator(populate.get_assignments())
-# file_generator.make_excel()
+day = datetime.date(2019, 4, 9)
+dates = [day]
+
+days_to_add = 5
+for index in range(1, 32):
+    day = day + datetime.timedelta(days=days_to_add)
+    dates.append(day)
+    days_to_add = 2 if days_to_add == 5 else 5
+
+populate = Populate(dates)
+file_generator = ExcelFileGenerator(populate.get_assignments())
+file_generator.make_excel()
