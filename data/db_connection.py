@@ -5,11 +5,26 @@ from data import member
 
 class DBConnection:
     __PATH_TO_DB = "../database/data.db"
+    #########################################################################
+    # checking for the existence of the database and connecting to it
     if not os.path.exists(__PATH_TO_DB):
         os.mkdir("../database")
-
     __con = sqlite3.connect(__PATH_TO_DB)
     cursor = __con.cursor()
+    # checking for the existence of the table(s) inside the database
+    table_creating_statement = 'CREATE TABLE IF NOT EXISTS member_info (' \
+                               'id                    INTEGER ' \
+                               'PRIMARY KEY AUTOINCREMENT,' \
+                               'firstName             VARCHAR not null,' \
+                               'lastName              VARCHAR not null,' \
+                               'hasDuplicateFirstName BOOLEAN not null,' \
+                               'canBeStage            BOOLEAN,' \
+                               'canRotateMic          BOOLEAN,' \
+                               'canAssist2ndHall      BOOLEAN,' \
+                               'sundayException       BOOLEAN' \
+                               ');'
+    cursor.execute(table_creating_statement)
+    #########################################################################
 
     @staticmethod
     def add_member(_member):
