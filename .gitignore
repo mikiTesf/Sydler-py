@@ -1,5 +1,7 @@
 .idea/
 controller/__init__.py
-data/__init__.py
+sydler/data/__init__.py
 database/
 *__pycache__*
+env/
+members.db

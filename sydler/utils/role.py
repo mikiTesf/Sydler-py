@@ -11,12 +11,10 @@ class Role(Enum):
 
     @staticmethod
     def get_roles():
-        all_roles = (
+        return (
             Role.STAGE,
             Role.MIC_ROUND_1_LEFT,
             Role.MIC_ROUND_1_RIGHT,
             Role.MIC_ROUND_2_LEFT,
             Role.MIC_ROUND_2_RIGHT,
-            Role.SECOND_HALL
-        )
-        return all_roles
+            Role.SECOND_HALL)

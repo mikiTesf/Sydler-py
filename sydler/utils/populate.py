@@ -1,20 +1,18 @@
 import random
 import sys
-# import datetime
 
-from controller.role import Role
-from controller.assignment import Assignment
-from data.member import Member
+from sydler.utils.role import Role
+from sydler.utils.assignment import Assignment
+from sydler.data.member import Member
 
 
 class Populate:
 
     def __init__(self, total_days):
         self.__program_dates = total_days
-        self.__all_members = Member.get_all_members()
+        self.__all_members = Member.select()
         if len(self.__all_members) == 0:
-            print('no members found in the database\nexiting...')
-            sys.exit()
+            sys.exit('no members found in the database\nexiting...')
         self.__assignment_queue = []
         self.__BEST = 2.0
         self.__NORMAL = 1.0
@@ -39,17 +37,17 @@ class Populate:
                 else:  # _role is Role.SECOND_HALL
                     var_qualify = self.qualify(_member.can_assist_2nd_hall)
 
-                var_occupied = self.is_occupied(_member.ID, _role, _date)
+                var_occupied = self.is_occupied(_member.id, _role, _date)
                 var_role_exception = self.__BEST
 
                 if _role == Role.STAGE:
                     var_role_exception = self.has_exception(_member.has_sunday_exception, _date)
 
-                var_distance = self.distance(_member.ID)
-                var_appearance_before = self.number_of_times_before(_member.ID)
-                var_appearance_today = self.number_of_times_today(_member.ID, _date)
+                var_distance = self.distance(_member.id)
+                var_appearance_before = self.number_of_times_before(_member.id)
+                var_appearance_today = self.number_of_times_today(_member.id, _date)
 
-                id_rank_pair[_member.ID] = self.rank(
+                id_rank_pair[_member.id] = self.rank(
                     var_qualify,
                     var_occupied,
                     var_role_exception,
@@ -131,11 +129,9 @@ class Populate:
                 chosen_member_ids.append(member_id)
 
         random.shuffle(chosen_member_ids)
-        # even after shuffling the possible candidates list, a random
-        # index using which a member will be chosen is generated (makes
-        # the process even more random)
-        random_index = random.randint(0, len(chosen_member_ids) - 1)
-        return chosen_member_ids[random_index]
+        # even after shuffling the possible candidates list, a random choice is
+        # made from among the candidates(makes the process even more random)
+        return random.choice(chosen_member_ids)
 
     @staticmethod
     def is_sunday(_date_):
@@ -145,33 +141,3 @@ class Populate:
         for _role in Role.get_roles():
             self.populate_role(_role)
         return self.__assignment_queue
-
-    # def show_assignments(self):
-    #     for _assignment in self.__assignment_queue:
-    #         for _date in self.__program_dates:
-    #             if _assignment.assignment_date == _date:
-    #                 print(_assignment.assignment_date, _assignment.target_role, _assignment.assignee_id, sep=" : ")
-
-
-# # uncomment `show_assignments()` in the class above and the code below this comment
-# # in order to test/debug this class
-# day = datetime.datetime.now()
-# dates = [
-#     day + datetime.timedelta(days=1),
-#     day + datetime.timedelta(days=2),
-#     day + datetime.timedelta(days=3),
-#     day + datetime.timedelta(days=4),
-#     day + datetime.timedelta(days=5),
-#     day + datetime.timedelta(days=6),
-#     day + datetime.timedelta(days=7),
-#     day + datetime.timedelta(days=8),
-#     day + datetime.timedelta(days=9),
-#     day + datetime.timedelta(days=10),
-#     day + datetime.timedelta(days=11),
-#     day + datetime.timedelta(days=12)
-# ]
-#
-# popular = Populate(dates)
-# assignments = popular.get_assignments()
-#
-# popular.show_assignments()

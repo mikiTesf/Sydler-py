@@ -1,23 +1,18 @@
 import datetime
 
-import openpyxl.workbook
-from openpyxl.styles import Font
-from openpyxl.styles import Alignment
-from openpyxl.styles import PatternFill
-from openpyxl.styles import Border
-from openpyxl.styles import Side
-from openpyxl.styles import Color
+from openpyxl.workbook import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side, Color
 
-from controller.populate import Populate
-from controller.role import Role
-from data.member import Member
+from sydler.utils.populate import Populate
+from sydler.utils.role import Role
+from sydler.data.member import Member
 
 
 class ExcelFileGenerator:
 
     def __init__(self, assignment_queue):
         self.__assignment_queue = assignment_queue
-        self.__workbook = openpyxl.Workbook()
+        self.__workbook = Workbook()
         self.active_sheet = self.__workbook.get_active_sheet()
         # program dates
         self.__program_dates = []
@@ -36,10 +31,10 @@ class ExcelFileGenerator:
         # Therefore, there should be a dictionary from which the corresponding member name
         # can be fetched
         self.name_id_pair = dict()
-        for _member in Member.get_all_members():
+        for _member in Member.select():
             if _member.first_name_is_duplicate:
                 self.name_id_pair[_member.ID] = _member.first_name + ' ' + _member.last_name
-            self.name_id_pair[_member.ID] = _member.first_name
+            self.name_id_pair[_member.id] = _member.first_name
 
     def sort_assignees(self):
         for _assignment in self.__assignment_queue:
@@ -255,19 +250,3 @@ class ExcelFileGenerator:
     def complete_generation(self):
         self.active_sheet.paper_size = 'A4'
         self.__workbook.save("../schedule.xlsx")
-
-
-# use the code below to test/debug this class
-# `day` below is a Tuesday
-day = datetime.date(2019, 4, 9)
-dates = [day]
-
-days_to_add = 5
-for index in range(1, 32):
-    day = day + datetime.timedelta(days=days_to_add)
-    dates.append(day)
-    days_to_add = 2 if days_to_add == 5 else 5
-
-populate = Populate(dates)
-file_generator = ExcelFileGenerator(populate.get_assignments())
-file_generator.make_excel()
