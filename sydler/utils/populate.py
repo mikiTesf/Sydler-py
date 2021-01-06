@@ -27,15 +27,10 @@ class Populate:
             for _member in self.__all_members:
                 if _role == Role.STAGE:
                     var_qualify = self.qualify(_member.can_be_stage)
-                elif _role in [
-                    Role.MIC_ROUND_1_LEFT,
-                    Role.MIC_ROUND_2_RIGHT,
-                    Role.MIC_ROUND_2_LEFT,
-                    Role.MIC_ROUND_2_RIGHT
-                ]:
-                    var_qualify = self.qualify(_member.can_rotate_mic)
-                else:  # _role is Role.SECOND_HALL
+                elif _role == Role.SECOND_HALL:
                     var_qualify = self.qualify(_member.can_assist_2nd_hall)
+                else:  # _role is mic rotation
+                    var_qualify = self.qualify(_member.can_rotate_mic)
 
                 var_occupied = self.is_occupied(_member.id, _role, _date)
                 var_role_exception = self.__BEST
@@ -60,16 +55,14 @@ class Populate:
             self.__assignment_queue.append(new_assignment)
 
     def qualify(self, qualification):
-        if qualification:
-            return self.__NORMAL
-        return self.__LEAST
+        return self.__NORMAL if qualification else self.__LEAST
 
-    def is_occupied(self, member_id, _role_, _date_):
+    def is_occupied(self, member_id, role, date):
         occupied = False
 
         for _assignment in self.__assignment_queue:
-            if (_assignment.assignee_id == member_id) and (_assignment.assignment_date == _date_):
-                if _role_ == Role.STAGE:
+            if (_assignment.assignee_id == member_id) and (_assignment.assignment_date == date):
+                if role == Role.STAGE:
                     return self.__LEAST
                 occupied = occupied or True
 

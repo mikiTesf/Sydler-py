@@ -1,11 +1,10 @@
 import datetime
 
-from openpyxl.workbook import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side, Color
+from openpyxl.workbook import Workbook
 
-from sydler.utils.populate import Populate
-from sydler.utils.role import Role
 from sydler.data.member import Member
+from sydler.utils.role import Role
 
 
 class ExcelFileGenerator:
@@ -249,4 +248,4 @@ class ExcelFileGenerator:
 
     def complete_generation(self):
         self.active_sheet.paper_size = 'A4'
-        self.__workbook.save("../schedule.xlsx")
+        self.__workbook.save("schedule.xlsx")
